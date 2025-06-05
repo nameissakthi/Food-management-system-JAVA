@@ -35,4 +35,13 @@ public class Breakfast extends Food{
                 return item;
         return null;
     }
+
+    public void addFood(Item item){
+        breakfast.add(item);
+    }
+
+    public int getLastFoodId(){
+        Item item = breakfast.getLast();
+        return item.getId();
+    }
 }

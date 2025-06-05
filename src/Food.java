@@ -10,4 +10,8 @@ public class Food {
     public int priceOfFood(int id){ return -1; }
 
     public Item getFood(int id){ return null; }
+
+    public void addFood(Item item){}
+
+    public int getLastFoodId(){ return -1; }
 }

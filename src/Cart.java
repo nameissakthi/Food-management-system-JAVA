@@ -74,4 +74,8 @@ public class Cart {
     public void clearCart(){
         cart.clear();
     }
+
+    public ArrayList<CartItem> getCart(){
+        return cart;
+    }
 }

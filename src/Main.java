@@ -1,11 +1,27 @@
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 class Admin{
     private String username = "sakthivel";
     private String password = "123456789";
     Scanner sc = new Scanner(System.in);
+    Food Breakfast, Lunch, Dinner, Sidedish;
+
+    public Admin(Food Breakfast, Food Lunch, Food Dinner, Food Sidedish){
+        this.Breakfast = Breakfast;
+        this.Lunch = Lunch;
+        this.Dinner = Dinner;
+        this.Sidedish = Sidedish;
+
+        if(Breakfast.getFood().isEmpty())
+            Breakfast.makeFood();
+        if(Lunch.getFood().isEmpty())
+            Lunch.makeFood();
+        if(Dinner.getFood().isEmpty())
+            Dinner.makeFood();
+        if(Sidedish.getFood().isEmpty())
+            Sidedish.makeFood();
+    }
 
     public void checkCredential(){
         System.out.print("\nEnter username : ");
@@ -54,7 +70,55 @@ class Admin{
     }
 
     public void listItems(){
+        System.out.println("The List Item We Serve in our Hotel");
+        System.out.println("For Breakfast : ");
+        Breakfast.display();
+        System.out.println("For Lunch : ");
+        Lunch.display();
+        System.out.println("For Dinner : ");
+        Dinner.display();
+        System.out.println("For Side Dish : ");
+        Sidedish.display();
+    }
 
+    public void addFood(){
+        String name;
+        int price;
+        System.out.println("ADD FOOD ITEM");
+        System.out.println("-------------");
+        System.out.println("1. Breakfast");
+        System.out.println("2. Lunch");
+        System.out.println("3. Dinner");
+        System.out.print("Enter Your Choice : ");
+        int choice = sc.nextInt();
+        switch (choice){
+            case 1:
+                System.out.println("-----Add Breakfast-----");
+                System.out.print("\nEnter the name of Breakfast : ");
+                name = sc.next();
+                System.out.print("\nEnter the price of the Food : ");
+                price = sc.nextInt();
+                Breakfast.addFood(new Item(Breakfast.getLastFoodId(), name, price));
+                break;
+            case 2:
+                System.out.println("-----Add Lunch-----");
+                System.out.print("\nEnter the name of Food : ");
+                name = sc.next();
+                System.out.print("\nEnter the price of the Food : ");
+                price = sc.nextInt();
+                Lunch.addFood(new Item(Breakfast.getLastFoodId(), name, price));
+                break;
+            case 3:
+                System.out.println("-----Add Dinner-----");
+                System.out.print("\nEnter the name of food : ");
+                name = sc.next();
+                System.out.print("\nEnter the price of the Food : ");
+                price = sc.nextInt();
+                Dinner.addFood(new Item(Breakfast.getLastFoodId(), name, price));
+                break;
+            default:
+                System.out.println("Wrong Choice");
+        }
     }
 
     private void options(){
@@ -68,6 +132,7 @@ class Admin{
         System.out.print("Enter Your Choice : ");
         switch (sc.nextInt()){
             case 1:
+                addFood();
                 break;
             case 2:
                 changePassword();
@@ -111,33 +176,6 @@ class Serving{
             Total = (mainDishPrice*quantity[0])+(sideDishPrice*quantity[1]);
 
         return Total;
-    }
-
-    public void payBill(Cart cart){
-        boolean bool = true;
-        System.out.println("""
-                ----------------
-                |     Cart     |
-                ----------------
-                """);
-        cart.displayCart();
-        System.out.println("Total Amount : "+cart.getTotal());
-        System.out.println("Do you want to checkout(Y/N) : ");
-        char ch = sc.next().trim().charAt(0);
-        while (bool){
-            if(ch=='y' || ch=='Y') {
-                System.out.println("Please Enter the Amount To Pay : ");
-                int amount = sc.nextInt();
-                if(cart.getTotal()!=amount){
-                    System.out.println("Please Enter correct Amount");
-                }else {
-                    cart.clearCart();
-                    bool = false;
-                }
-            }
-        }
-
-        UtilFunc.thankYouScreen();
     }
 
     public void mainDish(LocalTime time, Breakfast bf, Lunch lun, Dinner din, Sidedish sidedish, Cart cart){
@@ -189,10 +227,10 @@ class User{
     Serving serving = null;
     Admin admin = null;
 
-    public void chooseUser(Breakfast breakfast, Lunch lunch, Dinner dinner, Sidedish sidedish, Cart cart){
+    public void chooseUser(Breakfast breakfast, Lunch lunch, Dinner dinner, Sidedish sidedish, Cart cart, Payment payment){
         Scanner sc = new Scanner(System.in);
         char ch = 'y';
-        while (ch=='y'){
+        while (ch=='y' || ch=='Y'){
             System.out.println("""
                 1. Admin
                 2. Consumer
@@ -200,7 +238,7 @@ class User{
             System.out.print("Enter Your Choice : ");
             switch (sc.nextInt()){
                 case 1:
-                    admin = new Admin();
+                    admin = new Admin(breakfast, lunch, dinner, sidedish);
                     admin.checkCredential();
                     break;
                 case 2:
@@ -223,6 +261,7 @@ public class Main {
     static Dinner dinner;
     static Sidedish sidedish;
     static Cart cart;
+    static Payment payment;
 
     public static void main(String[] args) {
         System.out.println("----------------------------");
@@ -235,7 +274,11 @@ public class Main {
         dinner = new Dinner();
         sidedish = new Sidedish();
         cart = new Cart();
+        payment = new Payment();
 
-        new User().chooseUser(breakfast, lunch, dinner, sidedish, cart);
+        new User().chooseUser(breakfast, lunch, dinner, sidedish, cart, payment);
+
+        if(!cart.getCart().isEmpty())
+            payment.payBill(cart);
     }
 }
