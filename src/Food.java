@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class Food {
+abstract class Food {
     public void makeFood(){}
 
     public ArrayList<Item> getFood(){ return null; }

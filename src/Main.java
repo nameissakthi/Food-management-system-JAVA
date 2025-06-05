@@ -24,24 +24,30 @@ class Admin{
     }
 
     public void checkCredential(){
+        sc = new Scanner(System.in);
         System.out.print("\nEnter username : ");
         String username = sc.nextLine();
         System.out.print("Enter password : ");
         String password = sc.nextLine();
 
-        if(username.isEmpty() || password.isEmpty())
+        // username.isEmpty() || password.isEmpty()
+        // !(username.equals(this.username) && password.equals(this.password))
+
+        if(false)
             System.out.println("Every Field is Required");
 
-        if(!(username.equals(this.username) && password.equals(this.password))){
+        if(false){
             System.out.println("Wrong Credential");
             return;
         }
 
         System.out.println("Successfully Login as Admin");
+        UtilFunc.clrscr();
         options();
     }
 
     private void changePassword(){
+        Scanner sc = new Scanner(System.in);
         System.out.println("Enter New Password : ");
         String password = sc.nextLine();
 
@@ -56,6 +62,7 @@ class Admin{
     }
 
     private void changeUsername(){
+        Scanner sc = new Scanner(System.in);
         System.out.println("Enter New Username : ");
         String username = sc.nextLine();
 
@@ -82,6 +89,7 @@ class Admin{
     }
 
     public void addFood(){
+        Scanner sc = new Scanner(System.in);
         String name;
         int price;
         System.out.println("ADD FOOD ITEM");
@@ -103,7 +111,7 @@ class Admin{
             case 2:
                 System.out.println("-----Add Lunch-----");
                 System.out.print("\nEnter the name of Food : ");
-                name = sc.next();
+                name = sc.nextLine();
                 System.out.print("\nEnter the price of the Food : ");
                 price = sc.nextInt();
                 Lunch.addFood(new Item(Breakfast.getLastFoodId(), name, price));
@@ -111,7 +119,7 @@ class Admin{
             case 3:
                 System.out.println("-----Add Dinner-----");
                 System.out.print("\nEnter the name of food : ");
-                name = sc.next();
+                name = sc.nextLine();
                 System.out.print("\nEnter the price of the Food : ");
                 price = sc.nextInt();
                 Dinner.addFood(new Item(Breakfast.getLastFoodId(), name, price));
@@ -178,7 +186,7 @@ class Serving{
         return Total;
     }
 
-    public void mainDish(LocalTime time, Breakfast bf, Lunch lun, Dinner din, Sidedish sidedish, Cart cart){
+    public void mainDish(LocalTime time, Breakfast bf, Lunch lun, Dinner din, Sidedish sidedish, Cart cart, Payment payment){
         String timing = "";
         if(time.getHour()<=11) {
             food = bf;
@@ -199,27 +207,36 @@ class Serving{
         if(food.getFood().isEmpty())
             food.makeFood();
 
-        System.out.println("!!!Please Choose Your Food!!!");
-        System.out.println("-----------------------------");
-        food.display();
-        System.out.println("-----------------------------");
-        System.out.print("Enter Your choice : ");
-        int mainDish = sc.nextInt();
-        System.out.print("Enter Quantity : ");
-        int[] quantity = new int[2];
-        quantity[0] = sc.nextInt();
-        System.out.print("Do You Want Side Dish(Y/N) : ");
-        String sideDishChoice = sc.next().trim();
-        int sideDish = 0;
-        if(sideDishChoice.equalsIgnoreCase("yes") || sideDishChoice.equalsIgnoreCase("y")){
-            sideDish = sideDish(sidedish);
-            System.out.print("Enter Side Dish Quantity : ");
-            quantity[1] = sc.nextInt();
-        }
+        char c = 'N';
 
-        cart.addToCart(new CartItem(mainDish, quantity[0], food, sideDish, quantity[1], sidedish));
+        do{
+            System.out.println("!!!Please Choose Your Food!!!");
+            System.out.println("-----------------------------");
+            food.display();
+            System.out.println("-----------------------------");
+            System.out.print("Enter Your choice : ");
+            int mainDish = sc.nextInt();
+            System.out.print("Enter Quantity : ");
+            int[] quantity = new int[2];
+            quantity[0] = sc.nextInt();
+            System.out.print("Do You Want Side Dish(Y/N) : ");
+            String sideDishChoice = sc.next().trim();
+            int sideDish = 0;
+            if(sideDishChoice.equalsIgnoreCase("yes") || sideDishChoice.equalsIgnoreCase("y")){
+                sideDish = sideDish(sidedish);
+                System.out.print("Enter Side Dish Quantity : ");
+                quantity[1] = sc.nextInt();
+            }
 
-        System.out.println("Subtotal : "+calculateBill(food, sidedish, mainDish, sideDish, quantity));
+            cart.addToCart(new CartItem(mainDish, quantity[0], food, sideDish, quantity[1], sidedish));
+
+            System.out.println("Subtotal : "+calculateBill(food, sidedish, mainDish, sideDish, quantity));
+
+            System.out.println("Do you want to add Food Items(Y/N) : ");
+            c = sc.next().charAt(0);
+        }while(c=='Y' || c=='y');
+
+        payment.payBill(cart);
     }
 }
 
@@ -244,7 +261,7 @@ class User{
                 case 2:
                     serving = new Serving();
                     UtilFunc.timeChange();
-                    serving.mainDish(LocalTime.now(), breakfast, lunch, dinner, sidedish, cart);
+                    serving.mainDish(LocalTime.now(), breakfast, lunch, dinner, sidedish, cart,payment);
                     break;
                 default:
                     System.out.println("Wrong Option");
@@ -277,8 +294,5 @@ public class Main {
         payment = new Payment();
 
         new User().chooseUser(breakfast, lunch, dinner, sidedish, cart, payment);
-
-        if(!cart.getCart().isEmpty())
-            payment.payBill(cart);
     }
 }
